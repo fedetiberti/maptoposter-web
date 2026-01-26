@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - CORS_ORIGINS=http://localhost:5173,http://localhost:3000,http://localhost
+      - MAX_WORKERS=2
+      - JOB_EXPIRY_HOURS=1
+      - CACHE_DIR=/tmp/maptoposter-cache
+      - OUTPUT_DIR=/tmp/maptoposter-output
+    volumes:
+      - poster-cache:/tmp/maptoposter-cache
+      - poster-output:/tmp/maptoposter-output
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  poster-cache:
+  poster-output:
