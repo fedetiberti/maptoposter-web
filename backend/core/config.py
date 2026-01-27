@@ -2,24 +2,20 @@
 Application configuration using Pydantic Settings.
 """
 import os
-from typing import List, Union
-from pydantic import field_validator
-from pydantic_settings import BaseSettings
+from typing import List
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
-    # CORS
-    cors_origins: List[str] = ["http://localhost:5173", "http://localhost:3000"]
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+    )
 
-    @field_validator("cors_origins", mode="before")
-    @classmethod
-    def parse_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:
-        """Parse CORS origins from comma-separated string or list."""
-        if isinstance(v, str):
-            return [origin.strip() for origin in v.split(",") if origin.strip()]
-        return v
+    # CORS - stored as comma-separated string, parsed to list
+    cors_origins_str: str = "http://localhost:5173,http://localhost:3000"
 
     # Job processing
     max_workers: int = 2
@@ -36,9 +32,10 @@ class Settings(BaseSettings):
     themes_dir: str = "themes"
     fonts_dir: str = "fonts"
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
+    @property
+    def cors_origins(self) -> List[str]:
+        """Parse CORS origins from comma-separated string."""
+        return [origin.strip() for origin in self.cors_origins_str.split(",") if origin.strip()]
 
 
 # Create settings instance
