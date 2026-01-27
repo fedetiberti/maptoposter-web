@@ -1,7 +1,6 @@
 /**
  * Theme picker component with color swatches
  */
-import React from 'react';
 import { Theme } from '../api/client';
 
 interface ThemePickerProps {

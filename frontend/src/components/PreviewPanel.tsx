@@ -1,7 +1,6 @@
 /**
  * Preview panel component showing generation status and download
  */
-import React from 'react';
 import { JobStatus } from '../api/client';
 
 interface PreviewPanelProps {
@@ -28,7 +27,6 @@ export function PreviewPanel({
   canGenerate,
 }: PreviewPanelProps) {
   const progress = jobStatus?.progress || 0;
-  const isComplete = jobStatus?.status === 'complete';
 
   return (
     <div className="preview-section">

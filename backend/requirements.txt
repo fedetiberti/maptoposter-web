@@ -19,3 +19,4 @@ pillow==12.1.0
 pydantic==2.9.2
 pydantic-settings==2.5.2
 slowapi==0.1.9
+certifi>=2024.0.0

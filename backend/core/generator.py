@@ -5,21 +5,26 @@ import os
 import sys
 import json
 import ssl
+import certifi
 import urllib3
 import requests
 from datetime import datetime
 from typing import Optional, Tuple
 
-# Disable SSL verification warnings for development (corporate proxy issue)
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+# Check if SSL verification should be disabled (for development with corporate proxies)
+DISABLE_SSL_VERIFY = os.getenv("DISABLE_SSL_VERIFY", "false").lower() == "true"
 
-# Monkey-patch requests to disable SSL verification globally (development only)
-# This is needed because corporate proxy intercepts HTTPS with self-signed cert
-_original_request = requests.Session.request
-def _patched_request(self, *args, **kwargs):
-    kwargs['verify'] = False
-    return _original_request(self, *args, **kwargs)
-requests.Session.request = _patched_request
+if DISABLE_SSL_VERIFY:
+    # Disable SSL verification warnings for development (corporate proxy issue)
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+    # Monkey-patch requests to disable SSL verification globally (development only)
+    # This is needed because corporate proxy intercepts HTTPS with self-signed cert
+    _original_request = requests.Session.request
+    def _patched_request(self, *args, **kwargs):
+        kwargs['verify'] = False
+        return _original_request(self, *args, **kwargs)
+    requests.Session.request = _patched_request
 
 from core.config import settings
 from core.jobs import Job, JobStatus, update_job
@@ -40,16 +45,20 @@ import geopy.geocoders
 import time
 from shapely.geometry import Point
 
-# Create unverified SSL context for development (corporate proxy with self-signed cert)
-ssl_context = ssl.create_default_context()
-ssl_context.check_hostname = False
-ssl_context.verify_mode = ssl.CERT_NONE
-
-# Configure geopy to skip SSL verification
-geopy.geocoders.options.default_ssl_context = ssl_context
-
-# Configure OSMnx to skip SSL verification
-ox.settings.requests_kwargs = {"verify": False}
+# SSL context configuration
+if DISABLE_SSL_VERIFY:
+    # Create unverified SSL context for development (corporate proxy with self-signed cert)
+    ssl_context = ssl.create_default_context()
+    ssl_context.check_hostname = False
+    ssl_context.verify_mode = ssl.CERT_NONE
+    # Configure geopy to skip SSL verification
+    geopy.geocoders.options.default_ssl_context = ssl_context
+    # Configure OSMnx to skip SSL verification
+    ox.settings.requests_kwargs = {"verify": False}
+else:
+    # Production: use proper SSL verification with certifi
+    ssl_context = ssl.create_default_context(cafile=certifi.where())
+    geopy.geocoders.options.default_ssl_context = ssl_context
 
 
 def load_theme(theme_name: str) -> dict:

@@ -1,7 +1,7 @@
 /**
  * Main App component for MapToPoster web application
  */
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { api, Theme, DimensionPreset } from './api/client';
 import { useJob } from './hooks/useJob';
 import { LocationInput } from './components/LocationInput';

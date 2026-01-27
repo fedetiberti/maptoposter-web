@@ -1,7 +1,7 @@
 /**
  * Advanced options component with collapsible panel
  */
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { DimensionPreset } from '../api/client';
 
 interface AdvancedOptionsProps {

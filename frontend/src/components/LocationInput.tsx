@@ -1,7 +1,6 @@
 /**
  * Location input component for city and country
  */
-import React from 'react';
 
 interface LocationInputProps {
   city: string;
