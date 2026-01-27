@@ -2,7 +2,8 @@
 Application configuration using Pydantic Settings.
 """
 import os
-from typing import List
+from typing import List, Union
+from pydantic import field_validator
 from pydantic_settings import BaseSettings
 
 
@@ -11,6 +12,14 @@ class Settings(BaseSettings):
 
     # CORS
     cors_origins: List[str] = ["http://localhost:5173", "http://localhost:3000"]
+
+    @field_validator("cors_origins", mode="before")
+    @classmethod
+    def parse_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:
+        """Parse CORS origins from comma-separated string or list."""
+        if isinstance(v, str):
+            return [origin.strip() for origin in v.split(",") if origin.strip()]
+        return v
 
     # Job processing
     max_workers: int = 2
