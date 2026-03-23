@@ -13,6 +13,9 @@ function App() {
   // Location state
   const [city, setCity] = useState('');
   const [country, setCountry] = useState('');
+  const [useCoordinates, setUseCoordinates] = useState(false);
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
 
   // Theme state
   const [themes, setThemes] = useState<Theme[]>([]);
@@ -90,6 +93,14 @@ function App() {
     }
   };
 
+  // Build coordinate options if custom coordinates are enabled
+  const getCoordinateOptions = () => {
+    if (useCoordinates && latitude !== '' && longitude !== '') {
+      return { latitude: parseFloat(latitude), longitude: parseFloat(longitude) };
+    }
+    return {};
+  };
+
   // Handle preview generation
   const handlePreview = async () => {
     if (!city || !country) {
@@ -115,6 +126,7 @@ function App() {
           format: 'png', // Preview always PNG
           city_label: cityLabel || undefined,
           country_label: countryLabel || undefined,
+          ...getCoordinateOptions(),
         },
       });
 
@@ -148,6 +160,7 @@ function App() {
           format,
           city_label: cityLabel || undefined,
           country_label: countryLabel || undefined,
+          ...getCoordinateOptions(),
         },
       });
 
@@ -183,8 +196,14 @@ function App() {
   // Combine errors
   const displayError = error || jobError;
 
-  // Can generate if city and country are filled
-  const canGenerate = city.trim().length > 0 && country.trim().length > 0;
+  // Can generate if city and country are filled, plus valid coordinates if enabled
+  const hasValidCoordinates = !useCoordinates || (
+    latitude !== '' && longitude !== '' &&
+    !isNaN(parseFloat(latitude)) && !isNaN(parseFloat(longitude)) &&
+    parseFloat(latitude) >= -90 && parseFloat(latitude) <= 90 &&
+    parseFloat(longitude) >= -180 && parseFloat(longitude) <= 180
+  );
+  const canGenerate = city.trim().length > 0 && country.trim().length > 0 && hasValidCoordinates;
 
   if (isLoading) {
     return (
@@ -217,6 +236,12 @@ function App() {
             country={country}
             onCityChange={setCity}
             onCountryChange={setCountry}
+            useCoordinates={useCoordinates}
+            onUseCoordinatesChange={setUseCoordinates}
+            latitude={latitude}
+            longitude={longitude}
+            onLatitudeChange={setLatitude}
+            onLongitudeChange={setLongitude}
             disabled={isPolling}
           />
 

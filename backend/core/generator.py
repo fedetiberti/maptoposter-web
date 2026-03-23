@@ -281,6 +281,8 @@ def generate_poster(
     city_label: Optional[str] = None,
     country_label: Optional[str] = None,
     is_preview: bool = False,
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
 ) -> str:
     """
     Generate a map poster and return the output file path.
@@ -304,7 +306,10 @@ def generate_poster(
 
         # Get coordinates
         update_job(job.id, progress=20)
-        point = get_coordinates(city, country)
+        if latitude is not None and longitude is not None:
+            point = (latitude, longitude)
+        else:
+            point = get_coordinates(city, country)
         lat, lon = point
 
         # Fetch street network

@@ -32,6 +32,8 @@ export interface GenerateOptions {
   format: 'png' | 'svg' | 'pdf';
   city_label?: string;
   country_label?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface GenerateRequest {

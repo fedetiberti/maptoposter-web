@@ -13,6 +13,8 @@ class GenerateOptions(BaseModel):
     format: Literal["png", "svg", "pdf"] = Field(default="png", description="Output format")
     city_label: Optional[str] = Field(default=None, description="Override city name on poster")
     country_label: Optional[str] = Field(default=None, description="Override country name on poster")
+    latitude: Optional[float] = Field(default=None, ge=-90, le=90, description="Custom latitude for map center (skips geocoding)")
+    longitude: Optional[float] = Field(default=None, ge=-180, le=180, description="Custom longitude for map center (skips geocoding)")
 
 
 class GenerateRequest(BaseModel):

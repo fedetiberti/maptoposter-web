@@ -123,6 +123,8 @@ async def generate_poster_endpoint(request: Request, body: GenerateRequest):
         city_label=body.options.city_label,
         country_label=body.options.country_label,
         is_preview=body.preview,
+        latitude=body.options.latitude,
+        longitude=body.options.longitude,
     )
 
     # Estimate wait time (rough heuristic)
